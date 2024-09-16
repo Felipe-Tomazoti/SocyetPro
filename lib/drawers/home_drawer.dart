@@ -40,22 +40,6 @@ class HomeDrawer extends StatelessWidget {
             },
           ),
           ListTile(
-            leading: const Icon(Icons.account_balance),
-            title: const Text('Ver Filiais Cadastradas'),
-            onTap: () {
-              Navigator.pop(context);
-              Navigator.pushNamed(context, '/filiaisCadastradas');
-            },
-          ),
-          ListTile(
-            leading: const Icon(Icons.list_alt),
-            title: const Text('Ver Campos Cadastrados'),
-            onTap: () {
-              Navigator.pop(context);
-              Navigator.pushNamed(context, '/camposCadastrados');
-            },
-          ),
-          ListTile(
             leading: const Icon(Icons.logout),
             title: const Text('Sair'),
             onTap: () {

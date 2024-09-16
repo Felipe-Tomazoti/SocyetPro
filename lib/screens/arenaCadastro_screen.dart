@@ -1,14 +1,18 @@
 import 'package:flutter/material.dart';
+import 'package:socyet_pro/models/arena_model.dart';
 
-class FilialCadastroPage extends StatefulWidget {
-  const FilialCadastroPage({super.key});
+class ArenaCadastro extends StatefulWidget {
+  const ArenaCadastro({super.key});
 
   @override
-  _FilialCadastroPageState createState() => _FilialCadastroPageState();
+  _ArenaCadastroState createState() => _ArenaCadastroState();
 }
 
-class _FilialCadastroPageState extends State<FilialCadastroPage> {
+class _ArenaCadastroState extends State<ArenaCadastro> {
   final TextEditingController _nomeController = TextEditingController();
+  final TextEditingController _cnpjController = TextEditingController();
+  final TextEditingController _cepController = TextEditingController();
+  final TextEditingController _celularController = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
@@ -33,26 +37,36 @@ class _FilialCadastroPageState extends State<FilialCadastroPage> {
               decoration: const InputDecoration(labelText: 'Nome do Estabelecimento'),
             ),
             TextField(
+              controller: _cnpjController,
               decoration: const InputDecoration(labelText: 'CNPJ'),
             ),
             TextField(
+              controller: _cepController,
               decoration: const InputDecoration(labelText: 'CEP'),
             ),
             TextField(
+              controller: _celularController,
               decoration: const InputDecoration(labelText: 'Celular'),
             ),
             const SizedBox(height: 20),
             ElevatedButton(
               onPressed: () {
-                String nomeFilial = _nomeController.text;
-                Navigator.pop(context, nomeFilial);
-                Future.delayed(Duration(milliseconds: 500), () {
-                  Navigator.pushNamed(
-                    context,
-                    '/detalhesFilial',
-                    arguments: nomeFilial,
+                try {
+                  final filial = ArenaModel(
+                    nome: _nomeController.text,
+                    cnpj: _cnpjController.text,
+                    cep: _cepController.text,
+                    celular: _celularController.text,
                   );
-                });
+
+                  Navigator.pop(context, filial);
+                } catch (e) {
+                  if (e is ArgumentError) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(content: Text(e.message)),
+                    );
+                  }
+                }
               },
               child: const Text('Cadastrar Filial e Entrar'),
             ),

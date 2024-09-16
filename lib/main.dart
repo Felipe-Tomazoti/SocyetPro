@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:socyet_pro/screens/HomePage.dart';
-import 'package:socyet_pro/screens/LoginPage.dart';
-import 'screens/FilialCadastroPage.dart';
-import 'screens/DetalhesFilialPage.dart';
-import 'screens/MarcarHorarioPage.dart';
+import 'package:socyet_pro/screens/homePage_screen.dart';
+import 'package:socyet_pro/screens/login_screen.dart';
+import 'screens/arenaCadastro_screen.dart';
+import 'screens/campoCadastro_screen.dart';
+import 'screens/marcarHorario_screen.dart';
 
 void main() {
   runApp(const MyApp());
@@ -26,11 +26,11 @@ class MyApp extends StatelessWidget {
       ),
       initialRoute: '/login',
       routes: {
-        '/login': (context) => const LoginPage(),
+        '/login': (context) => const Login(),
         '/home': (context) => const HomePage(),
-        '/filialCadastro': (context) => const FilialCadastroPage(),
-        '/detalhesFilial': (context) => const DetalhesFilialPage(),
-        '/marcarHorario': (context) => const MarcarHorarioPage(),
+        '/filialCadastro': (context) => const ArenaCadastro(),
+        '/detalhesFilial': (context) => const CampoCadastro(),
+        '/marcarHorario': (context) => const MarcarHorario(),
       },
     );
   }

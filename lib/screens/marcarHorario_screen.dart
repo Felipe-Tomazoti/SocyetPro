@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
 
-class MarcarHorarioPage extends StatefulWidget {
-  const MarcarHorarioPage({super.key});
+class MarcarHorario extends StatefulWidget {
+  const MarcarHorario({super.key});
 
   @override
-  _MarcarHorarioPageState createState() => _MarcarHorarioPageState();
+  _MarcarHorarioState createState() => _MarcarHorarioState();
 }
 
-class _MarcarHorarioPageState extends State<MarcarHorarioPage> {
+class _MarcarHorarioState extends State<MarcarHorario> {
   final TextEditingController _representanteController = TextEditingController();
 
   @override

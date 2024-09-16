@@ -1,4 +1,4 @@
-class ValidationService {
+class ValidationPwd {
   static bool isValidPassword(String password) {
     if (password.length < 8) return false;
 

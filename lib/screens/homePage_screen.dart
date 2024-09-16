@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
 import '../drawers/home_drawer.dart';
+import '../models/arena_model.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -10,7 +11,7 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  final List<String> _arenas = [];
+  final List<ArenaModel> _filiais = [];
 
   @override
   Widget build(BuildContext context) {
@@ -50,9 +51,9 @@ class _HomePageState extends State<HomePage> {
             ElevatedButton.icon(
               onPressed: () async {
                 final result = await Navigator.pushNamed(context, '/filialCadastro');
-                if (result != null) {
+                if (result != null && result is ArenaModel) {
                   setState(() {
-                    _arenas.add(result as String);
+                    _filiais.add(result);
                   });
                 }
               },
@@ -66,10 +67,22 @@ class _HomePageState extends State<HomePage> {
             ),
             Expanded(
               child: ListView.builder(
-                itemCount: _arenas.length,
+                itemCount: _filiais.length,
                 itemBuilder: (context, index) {
+                  final filial = _filiais[index];
                   return ListTile(
-                    title: Text(_arenas[index]),
+                    title: Text(filial.nome),
+                    subtitle: Text('Contato: ${filial.celular}'),
+                    trailing: IconButton(
+                      icon: const Icon(Icons.add),
+                      onPressed: () {
+                        Navigator.pushNamed(
+                          context,
+                          '/detalhesFilial',
+                          arguments: filial.nome,
+                        );
+                      },
+                    ),
                   );
                 },
               ),
