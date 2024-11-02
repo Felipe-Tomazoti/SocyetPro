@@ -1,0 +1,32 @@
+{
+  "login": [
+    {
+      "id": "b499e47e-77dc-4eb3-8a8e-a19acca80c24",
+      "email": "fedfe",
+      "pwd": "dwadaw"
+    }
+  ],
+  "arena": [
+    {
+      "id": "ef10b504-70e3-49d2-8ae2-49418b456dd9",
+      "nome": "dwa",
+      "cnpj": "dwa",
+      "telefone": "aw",
+      "campos": []
+    }
+  ],
+  "campo": [
+    {
+      "id": "465137dd-6d4b-4daa-b7c2-83e48216bd4d",
+      "nome": "Campo 1",
+      "campo": "semiProfissional",
+      "arenaId": null
+    },
+    {
+      "id": "8011fe71-c1ab-4d8c-9179-efdf692dc26a",
+      "nome": "Campo 2",
+      "campo": "profissional",
+      "arenaId": null
+    }
+  ]
+}
