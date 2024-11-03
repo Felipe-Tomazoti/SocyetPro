@@ -19,6 +19,12 @@ class ArenaService extends AbstractService<ArenaModel> {
     return object.toJson();
   }
 
+  @override
+  Future<ArenaModel> getById(String name) async {
+    final id = await getByName(name);
+    return super.getById(id);
+  }
+
   Future<String> getByName(String name) async {
     var uri =
         Uri.parse("$url/${recurso()}").replace(queryParameters: {'name': name});

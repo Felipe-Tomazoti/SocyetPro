@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:socyet_pro/enums/campo_enum.dart';
 import 'package:socyet_pro/models/campo_model.dart';
+import 'package:socyet_pro/services/arena_service.dart';
 import 'package:socyet_pro/services/campo_service.dart';
 
 class Campo extends StatefulWidget {
@@ -13,6 +14,7 @@ class Campo extends StatefulWidget {
 class _CampoState extends State<Campo> {
   Categoria? _selectedCampoSize;
   final CampoService _campoService = CampoService();
+  final ArenaService _arenaService = ArenaService();
   late Future<List<CampoModel>> _camposFuture;
 
   late String nomeArena;
@@ -25,7 +27,9 @@ class _CampoState extends State<Campo> {
   }
 
   Future<List<CampoModel>> _fetchCampos() async {
-    return await _campoService.getAllById(nomeArena);
+    final arena = await _arenaService.getById(nomeArena);
+    print('Arena selecionada: ${arena.nome}, ID: ${arena.id}');
+    return arena.campos;
   }
 
   Future<void> _addCampo() async {

@@ -53,8 +53,15 @@ class CampoService extends AbstractService<CampoModel> {
     print("getALLBYIDDDDD");
     print(response.statusCode);
     if (response.statusCode == 200) {
-      var jsonList = jsonDecode(response.body) as List;
-      return jsonList.map((json) => fromJson(json)).toList();
+      var jsonResponse = jsonDecode(response.body);
+      if (jsonResponse.containsKey('campos') &&
+          jsonResponse['campos'] is List) {
+        return jsonResponse['campos']
+            .map((json) => CampoModel.fromJson(json))
+            .toList();
+      } else {
+        return [];
+      }
     } else {
       throw Exception("Falha ao carregar os dados");
     }
@@ -65,7 +72,6 @@ class CampoService extends AbstractService<CampoModel> {
     var response = await http.get(Uri.parse("$url/arena/$arenaId"));
     if (response.statusCode == 200) {
       var jsonResponse = jsonDecode(response.body);
-
       if (jsonResponse['campos'] is List) {
         return List<Map<String, dynamic>>.from(jsonResponse['campos']);
       } else {
