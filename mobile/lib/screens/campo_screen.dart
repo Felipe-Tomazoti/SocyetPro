@@ -15,21 +15,23 @@ class _CampoState extends State<Campo> {
   final CampoService _campoService = CampoService();
   late Future<List<CampoModel>> _camposFuture;
 
+  late String nomeArena;
+
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
+    nomeArena = ModalRoute.of(context)!.settings.arguments as String;
     _camposFuture = _fetchCampos();
   }
 
   Future<List<CampoModel>> _fetchCampos() async {
-    return await _campoService.getAll();
+    return await _campoService.getAllById(nomeArena);
   }
 
   Future<void> _addCampo() async {
     if (_selectedCampoSize != null) {
       final novoCampo = CampoModel(campo: _selectedCampoSize!);
-
-      final response = await _campoService.post(novoCampo);
+      final response = await _campoService.postWithArena(novoCampo, nomeArena);
       if (response['status'] == 201) {
         setState(() {
           _camposFuture = _fetchCampos();
@@ -46,13 +48,17 @@ class _CampoState extends State<Campo> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Cadastrar Campos'),
+        title: Text('Cadastrar Campos - $nomeArena'),
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            Text('Arena: $nomeArena',
+                style:
+                    const TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+            const SizedBox(height: 10),
             const Text('Cadastrar Campo:', style: TextStyle(fontSize: 18)),
             DropdownButton<Categoria>(
               value: _selectedCampoSize,

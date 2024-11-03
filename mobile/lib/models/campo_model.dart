@@ -5,7 +5,7 @@ class CampoModel {
   final String id;
   final Categoria? campo;
   final String? nome;
-  final String? arenaId;
+  String? arenaId;
 
   static int _counter = 1;
 

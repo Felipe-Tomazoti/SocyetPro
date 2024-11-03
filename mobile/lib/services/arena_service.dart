@@ -18,4 +18,22 @@ class ArenaService extends AbstractService<ArenaModel> {
   Map<String, dynamic> toJson(ArenaModel object) {
     return object.toJson();
   }
+
+  Future<String> getByName(String name) async {
+    var uri =
+        Uri.parse("$url/${recurso()}").replace(queryParameters: {'name': name});
+    var response = await http.get(uri);
+
+    if (response.statusCode == 200) {
+      var jsonResponse = jsonDecode(response.body);
+
+      if (jsonResponse is List && jsonResponse.isNotEmpty) {
+        return jsonResponse[0]['id'] as String;
+      } else {
+        throw Exception("Arena com o nome '$name' não encontrada");
+      }
+    } else {
+      throw Exception("Falha ao carregar o dado");
+    }
+  }
 }

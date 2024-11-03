@@ -34,9 +34,9 @@ abstract class AbstractService<T> {
       headers: {"Content-Type": "application/json"},
       body: jsonEncode(toJson(object)),
     );
-
+    var responseData = jsonDecode(response.body);
     if (response.statusCode == 201) {
-      return {"status": 201, "message": "Criação feita com sucesso!"};
+      return {"status": 201, "id": responseData['id']};
     } else {
       return {
         "status": response.statusCode,
