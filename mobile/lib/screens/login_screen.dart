@@ -73,7 +73,7 @@ class Login extends StatelessWidget {
                           loginModel.validationPwd();
                           LoginService loginService = LoginService();
                           loginService.post(loginModel);
-                          Navigator.pushNamed(context, '/home');
+                          Navigator.pushNamed(context, '/arena');
                         } catch (e) {
                           if (e is ArgumentError) {
                             ScaffoldMessenger.of(context).showSnackBar(

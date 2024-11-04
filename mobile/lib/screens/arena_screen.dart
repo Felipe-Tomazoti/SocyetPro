@@ -61,7 +61,8 @@ class _ArenaState extends State<Arena> {
                   );
                   ArenaService arenaService = ArenaService();
                   arenaService.post(arena);
-                  Navigator.pop(context, arena);
+                  Navigator.pushReplacementNamed(context, '/home',
+                      arguments: arena);
                 } catch (e) {
                   if (e is ArgumentError) {
                     ScaffoldMessenger.of(context).showSnackBar(

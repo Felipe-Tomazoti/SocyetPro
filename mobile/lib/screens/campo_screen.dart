@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:socyet_pro/enums/campo_enum.dart';
 import 'package:socyet_pro/models/campo_model.dart';
-import 'package:socyet_pro/services/arena_service.dart';
+import 'package:socyet_pro/models/arena_model.dart';
 import 'package:socyet_pro/services/campo_service.dart';
 
 class Campo extends StatefulWidget {
@@ -14,31 +14,29 @@ class Campo extends StatefulWidget {
 class _CampoState extends State<Campo> {
   Categoria? _selectedCampoSize;
   final CampoService _campoService = CampoService();
-  final ArenaService _arenaService = ArenaService();
+  late ArenaModel arenaSelecionada;
   late Future<List<CampoModel>> _camposFuture;
-
-  late String nomeArena;
 
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    nomeArena = ModalRoute.of(context)!.settings.arguments as String;
-    _camposFuture = _fetchCampos();
-  }
-
-  Future<List<CampoModel>> _fetchCampos() async {
-    final arena = await _arenaService.getById(nomeArena);
-    print('Arena selecionada: ${arena.nome}, ID: ${arena.id}');
-    return arena.campos;
+    arenaSelecionada = ModalRoute.of(context)!.settings.arguments as ArenaModel;
+    _camposFuture =
+        Future.value(arenaSelecionada.campos); // Carrega os campos existentes
   }
 
   Future<void> _addCampo() async {
     if (_selectedCampoSize != null) {
-      final novoCampo = CampoModel(campo: _selectedCampoSize!);
-      final response = await _campoService.postWithArena(novoCampo, nomeArena);
+      final novoCampo =
+          CampoModel(campo: _selectedCampoSize!, arenaId: arenaSelecionada.id);
+      final response =
+          await _campoService.postWithArena(novoCampo, arenaSelecionada.id);
       if (response['status'] == 201) {
         setState(() {
-          _camposFuture = _fetchCampos();
+          arenaSelecionada.campos
+              .add(novoCampo); // Atualiza localmente a lista de campos
+          _camposFuture = Future.value(
+              arenaSelecionada.campos); // Força o FutureBuilder a atualizar
         });
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -52,16 +50,17 @@ class _CampoState extends State<Campo> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Cadastrar Campos - $nomeArena'),
+        title: Text('Cadastrar Campos - ${arenaSelecionada.nome}'),
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text('Arena: $nomeArena',
-                style:
-                    const TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+            Text(
+              'Arena: ${arenaSelecionada.nome}',
+              style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+            ),
             const SizedBox(height: 10),
             const Text('Cadastrar Campo:', style: TextStyle(fontSize: 18)),
             DropdownButton<Categoria>(
@@ -110,15 +109,16 @@ class _CampoState extends State<Campo> {
                     return ListView.builder(
                       itemCount: campos.length,
                       itemBuilder: (context, index) {
+                        final campo = campos[index];
                         return ListTile(
                           title: Text(
-                            '${campos[index].nome ?? 'Campo sem nome'} - ${campos[index].campo?.toString().split('.').last}',
+                            '${campo.nome ?? 'Campo sem nome'} - ${campo.campo?.toString().split('.').last}',
                           ),
                           onTap: () {
                             Navigator.pushNamed(
                               context,
                               '/marcarHorario',
-                              arguments: campos[index].nome,
+                              arguments: campo.nome,
                             );
                           },
                         );

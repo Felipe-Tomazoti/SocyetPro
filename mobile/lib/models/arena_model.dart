@@ -7,15 +7,16 @@ class ArenaModel extends ChangeNotifier {
   String nome;
   String cnpj;
   String telefone;
-  List<CampoModel> campos;
+  List<CampoModel> campos = [];
 
   ArenaModel({
     String? id,
     required this.nome,
     required this.cnpj,
     required this.telefone,
-    this.campos = const [],
-  }) : id = Uuid().v4() {
+    List<CampoModel>? campos,
+  })  : id = id ?? Uuid().v4(),
+        campos = campos ?? [] {
     validationNome();
     validationCnpj();
     validationTelefone();

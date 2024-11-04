@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
 import 'package:socyet_pro/models/arena_model.dart';
+import 'package:socyet_pro/enums/campo_enum.dart';
+import 'package:socyet_pro/models/campo_model.dart';
+import 'package:socyet_pro/services/arena_service.dart';
+import 'package:socyet_pro/services/campo_service.dart';
 import 'package:socyet_pro/widgets/home_drawer.dart';
 
 class Home extends StatefulWidget {
@@ -11,23 +14,63 @@ class Home extends StatefulWidget {
 }
 
 class _HomeState extends State<Home> {
-  final List<ArenaModel> _filiais = [];
+  Categoria? _selectedCampoSize;
+  final CampoService _campoService = CampoService();
+  final ArenaService _arenaService = ArenaService();
+  late ArenaModel arenaSelecionada;
+  late Future<ArenaModel> _arenaFuture;
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    arenaSelecionada = ModalRoute.of(context)!.settings.arguments as ArenaModel;
+    _arenaFuture = _fetchArenaData();
+  }
+
+  Future<ArenaModel> _fetchArenaData() async {
+    return await _arenaService.getById(arenaSelecionada.id);
+  }
+
+  Future<void> _addCampo() async {
+    if (_selectedCampoSize != null) {
+      final novoCampo =
+          CampoModel(campo: _selectedCampoSize!, arenaId: arenaSelecionada.id);
+      final response =
+          await _campoService.postWithArena(novoCampo, arenaSelecionada.id);
+      if (response['status'] == 201) {
+        setState(() {
+          _arenaFuture = _fetchArenaData();
+        });
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(response['message'])),
+        );
+      }
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Padding(
-          padding: EdgeInsets.only(top: 15.0),
+        title: Padding(
+          padding: const EdgeInsets.only(top: 15.0),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
               Text(
-                'Aproveite o melhor do APP! \n - Agendamento \n - Gerenciamento \n - E muito mais',
+                arenaSelecionada.nome,
+                style: const TextStyle(
+                  fontSize: 24,
+                  fontWeight: FontWeight.bold,
+                  fontFamily: 'Anton',
+                ),
+              ),
+              const Text(
+                'Gerencie os campos da sua arena!',
                 style: TextStyle(
-                  fontSize: 20,
+                  fontSize: 16,
                   fontFamily: 'SUSE',
-                  fontWeight: FontWeight.w400,
                 ),
               ),
             ],
@@ -44,46 +87,69 @@ class _HomeState extends State<Home> {
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
             const Text(
-              '👇 Cadastre aqui 👇',
+              'Cadastrar Novo Campo:',
               style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 20),
-            ElevatedButton.icon(
-              onPressed: () async {
-                final result = await Navigator.pushNamed(context, '/arena');
-                if (result != null && result is ArenaModel) {
-                  setState(() {
-                    _filiais.add(result);
-                  });
-                }
+            DropdownButton<Categoria>(
+              value: _selectedCampoSize,
+              items: const [
+                DropdownMenuItem(
+                  child: Text('Amador'),
+                  value: Categoria.amador,
+                ),
+                DropdownMenuItem(
+                  child: Text('Semi-Profissional'),
+                  value: Categoria.semiProfissional,
+                ),
+                DropdownMenuItem(
+                  child: Text('Profissional'),
+                  value: Categoria.profissional,
+                ),
+              ],
+              hint: const Text('Selecione o tipo de campo'),
+              onChanged: (value) {
+                setState(() {
+                  _selectedCampoSize = value;
+                });
               },
-              icon: const Icon(MdiIcons.soccerField),
-              label: const Text('Cadastrar Arena'),
+            ),
+            const SizedBox(height: 20),
+            ElevatedButton(
+              onPressed: _selectedCampoSize == null ? null : _addCampo,
+              child: const Text('Confirmar Cadastro do Campo'),
             ),
             const SizedBox(height: 20),
             const Text(
-              'Arenas Cadastradas:',
+              'Campos Cadastrados:',
               style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
             ),
             Expanded(
-              child: ListView.builder(
-                itemCount: _filiais.length,
-                itemBuilder: (context, index) {
-                  final filial = _filiais[index];
-                  return ListTile(
-                    title: Text(filial.nome),
-                    subtitle: Text('Telefone: ${filial.telefone}'),
-                    trailing: IconButton(
-                      icon: const Icon(Icons.add),
-                      onPressed: () {
-                        Navigator.pushNamed(
-                          context,
-                          '/campo',
-                          arguments: filial.nome,
+              child: FutureBuilder<ArenaModel>(
+                future: _arenaFuture,
+                builder: (context, snapshot) {
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return const Center(child: CircularProgressIndicator());
+                  } else if (snapshot.hasError) {
+                    return Center(child: Text('Erro: ${snapshot.error}'));
+                  } else if (!snapshot.hasData ||
+                      snapshot.data!.campos.isEmpty) {
+                    return const Center(
+                        child: Text('Nenhum campo cadastrado.'));
+                  } else {
+                    final campos = snapshot.data!.campos;
+                    return ListView.builder(
+                      itemCount: campos.length,
+                      itemBuilder: (context, index) {
+                        final campo = campos[index];
+                        return ListTile(
+                          title: Text(
+                            '${campo.nome ?? 'Campo sem nome'} - ${campo.campo?.toString().split('.').last}',
+                          ),
                         );
                       },
-                    ),
-                  );
+                    );
+                  }
                 },
               ),
             ),
