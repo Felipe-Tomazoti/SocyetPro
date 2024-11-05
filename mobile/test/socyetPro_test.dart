@@ -1,9 +1,12 @@
+import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
+import 'package:provider/provider.dart';
 import 'package:socyet_pro/enums/campo_enum.dart';
 import 'package:socyet_pro/models/arena_model.dart';
 import 'package:socyet_pro/models/campo_model.dart';
 import 'package:socyet_pro/models/login_model.dart';
+import 'package:socyet_pro/screens/login_screen.dart';
 import 'package:socyet_pro/services/arena_service.dart';
 import 'package:socyet_pro/services/login_service.dart';
 
@@ -12,6 +15,19 @@ class MockArenaService extends Mock implements ArenaService {}
 class MockLoginService extends Mock implements LoginService {}
 
 void main() {
+  final mockLoginService = MockLoginService();
+
+  setUpAll(() {
+    registerFallbackValue(LoginModel.vazio());
+    when(() => mockLoginService.post(any()))
+        .thenAnswer((_) async => {'status': 200});
+  });
+
+  setUpAll(() {
+    registerFallbackValue(LoginModel.vazio());
+    when(() => mockLoginService.post(any())).thenAnswer((_) async => {});
+  });
+
   test("criação de arena - Unitário", () {
     ArenaModel arena = ArenaModel(
         nome: "Sumare Socyet",
@@ -91,5 +107,59 @@ void main() {
 
     verify(() => mockLoginService.update(fakeId, loginModel)).called(1);
     verify(() => mockLoginService.delete(fakeId)).called(1);
+  });
+
+  testWidgets('Renderização inicial da tela de login',
+      (WidgetTester tester) async {
+    await tester.pumpWidget(
+      MaterialApp(
+        home: ChangeNotifierProvider(
+          create: (_) => LoginModel.vazio(),
+          child: const Login(),
+        ),
+      ),
+    );
+
+    expect(find.text('SocyetPro'), findsOneWidget);
+    expect(find.text('Bem-vindo ao SocyetPro!'), findsOneWidget);
+    expect(find.byType(TextField), findsNWidgets(2));
+    expect(find.byType(ElevatedButton), findsOneWidget);
+  });
+
+  testWidgets('Validação do campo de e-mail vazio',
+      (WidgetTester tester) async {
+    await tester.pumpWidget(
+      MaterialApp(
+        home: ChangeNotifierProvider(
+          create: (_) => LoginModel.vazio(),
+          child: const Login(),
+        ),
+      ),
+    );
+
+    await tester.enterText(find.byType(TextField).first, '');
+    await tester.enterText(find.byType(TextField).last, 'senha123');
+    await tester.tap(find.byType(ElevatedButton));
+    await tester.pump();
+
+    expect(find.text('O e-mail não pode ser vazio'), findsOneWidget);
+  });
+
+  testWidgets('Validação do campo de senha vazio', (WidgetTester tester) async {
+    await tester.pumpWidget(
+      MaterialApp(
+        home: ChangeNotifierProvider(
+          create: (_) => LoginModel.vazio(),
+          child: const Login(),
+        ),
+      ),
+    );
+
+    await tester.enterText(find.byType(TextField).first, 'usuario@teste.com');
+    await tester.enterText(find.byType(TextField).last, '');
+    await tester.tap(find.byType(ElevatedButton));
+    await tester.pump();
+
+    expect(find.text('A senha não pode ser vazia'), findsOneWidget);
   });
 }

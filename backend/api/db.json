@@ -1,20 +1,11 @@
 {
-  "login": [],
-  "arena": [
-    {
-      "id": "e5b2d6c7-8c7d-49fc-b233-96675d2356c6",
-      "nome": "Sumare Socyet",
-      "cnpj": "132.132.123/0001-20",
-      "telefone": "(44) 99173-8254",
-      "campos": [
-        {
-          "id": "62d79823-08d8-4265-9075-80fd36ce19a8",
-          "nome": "Campo 1",
-          "campo": "amador",
-          "arenaId": null
-        }
-      ]
-    }
+  "login": [
+    
   ],
-  "campo": []
+  "arena": [
+    
+  ],
+  "campo": [
+    
+  ]
 }
