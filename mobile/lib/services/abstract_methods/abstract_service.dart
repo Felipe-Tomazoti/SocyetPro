@@ -31,7 +31,6 @@ abstract class AbstractService<T> {
   }
 
   Future<Map<String, dynamic>> post(T object) async {
-    print("Chegou aqui");
     var response = await http.post(
       Uri.parse("$url/${recurso()}"),
       headers: {"Content-Type": "application/json"},
@@ -66,8 +65,9 @@ abstract class AbstractService<T> {
       headers: {"Content-Type": "application/json"},
       body: jsonEncode(toJson(object)),
     );
+    var responseData = jsonDecode(response.body);
     if (response.statusCode == 202) {
-      return {"status": 202, "message": "Atualização feita com sucesso!"};
+      return {"status": 202, "id": responseData['id']};
     } else {
       return {
         "status": response.statusCode,

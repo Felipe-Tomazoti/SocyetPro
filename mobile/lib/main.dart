@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:socyet_pro/screens/arena_screen.dart';
-import 'package:socyet_pro/screens/campo_screen.dart';
 import 'package:socyet_pro/screens/home_screen.dart';
 import 'screens/login_screen.dart';
 
@@ -28,7 +27,6 @@ class MyApp extends StatelessWidget {
         '/login': (context) => const Login(),
         '/home': (context) => const Home(),
         '/arena': (context) => const Arena(),
-        '/campo': (context) => const Campo()
       },
     );
   }

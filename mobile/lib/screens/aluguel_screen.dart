@@ -2,32 +2,37 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:socyet_pro/models/aluguel_model.dart';
 import 'package:socyet_pro/models/campo_model.dart';
+import 'package:socyet_pro/services/aluguel_service.dart';
 import 'package:socyet_pro/services/campo_service.dart';
 
-class AddAluguelScreen extends StatefulWidget {
+class Aluguel extends StatefulWidget {
   final CampoModel campo;
 
-  const AddAluguelScreen({Key? key, required this.campo}) : super(key: key);
+  const Aluguel({Key? key, required this.campo}) : super(key: key);
 
   @override
-  _AddAluguelScreenState createState() => _AddAluguelScreenState();
+  _AluguelState createState() => _AluguelState();
 }
 
-class _AddAluguelScreenState extends State<AddAluguelScreen> {
+class _AluguelState extends State<Aluguel> {
   final _responsavelController = TextEditingController();
   DateTime? _inicio;
   DateTime? _fim;
   final CampoService _campoService = CampoService();
+  final AluguelService _aluguelService = AluguelService();
 
   Future<void> _salvarAluguel() async {
-    if (_inicio != null && _fim != null && _responsavelController.text.isNotEmpty) {
+    if (_inicio != null &&
+        _fim != null &&
+        _responsavelController.text.isNotEmpty) {
       final novoAluguel = AluguelModel(
         responsavel: _responsavelController.text,
         inicio: _inicio!,
         fim: _fim!,
       );
-
-      final sucesso = await _campoService.adicionarAluguel(widget.campo, novoAluguel);
+      await _aluguelService.post(novoAluguel);
+      final sucesso =
+          await _campoService.adicionarAluguel(widget.campo, novoAluguel);
 
       if (sucesso) {
         Navigator.of(context).pop();
@@ -40,7 +45,8 @@ class _AddAluguelScreenState extends State<AddAluguelScreen> {
   }
 
   Future<void> _selecionarHorarioInicio() async {
-    final time = await showTimePicker(context: context, initialTime: TimeOfDay.now());
+    final time =
+        await showTimePicker(context: context, initialTime: TimeOfDay.now());
     if (time != null) {
       setState(() {
         _inicio = DateTime(0, 0, 0, time.hour, time.minute);
@@ -49,7 +55,8 @@ class _AddAluguelScreenState extends State<AddAluguelScreen> {
   }
 
   Future<void> _selecionarHorarioFim() async {
-    final time = await showTimePicker(context: context, initialTime: TimeOfDay.now());
+    final time =
+        await showTimePicker(context: context, initialTime: TimeOfDay.now());
     if (time != null) {
       setState(() {
         _fim = DateTime(0, 0, 0, time.hour, time.minute);
@@ -67,7 +74,8 @@ class _AddAluguelScreenState extends State<AddAluguelScreen> {
           children: [
             TextField(
               controller: _responsavelController,
-              decoration: const InputDecoration(labelText: 'Nome do Responsável'),
+              decoration:
+                  const InputDecoration(labelText: 'Nome do Responsável'),
             ),
             const SizedBox(height: 20),
             ElevatedButton(

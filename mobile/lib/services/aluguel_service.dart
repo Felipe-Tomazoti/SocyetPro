@@ -7,7 +7,7 @@ class AluguelService extends AbstractService<AluguelModel> {
 
   @override
   String recurso() {
-    return "Aluguel";
+    return "aluguel";
   }
 
   @override

@@ -49,10 +49,7 @@ class CampoService extends AbstractService<CampoModel> {
 
   Future<List<CampoModel>> getAllById(String nomeArena) async {
     final id = await arenaService.getByName(nomeArena);
-    print(id);
     var response = await http.get(Uri.parse("$url/arena/${id}"));
-    print("getALLBYIDDDDD");
-    print(response.statusCode);
     if (response.statusCode == 200) {
       var jsonResponse = jsonDecode(response.body);
       if (jsonResponse.containsKey('campos') &&
@@ -84,11 +81,38 @@ class CampoService extends AbstractService<CampoModel> {
   }
 
   Future<bool> adicionarAluguel(CampoModel campo, AluguelModel aluguel) async {
-  if (campo.verificarDisponibilidade(aluguel)) {
-    campo.alugueis.add(aluguel);
-    await update(campo.id, campo);
-    return true;
+    if (campo.verificarDisponibilidade(aluguel)) {
+      campo.alugueis.add(aluguel);
+      var idCampoAtualizado = await update(campo.id, campo);
+
+      var arena = await arenaService.getById(campo.arenaId!);
+
+      int index = arena.campos.indexWhere((c) => c.id == campo.id);
+      if (index != -1) {
+        arena.campos[index] = campo;
+
+        await arenaService.update(arena.id, arena);
+        return true;
+      } else {
+        throw Exception("Campo com ID ${campo.id} não encontrado na Arena");
+      }
+    }
+    return false;
   }
-  return false;
-}
+
+  Future<String> getByName(String name) async {
+    var uri =
+        Uri.parse("$url/${recurso()}").replace(queryParameters: {'nome': name});
+    var response = await http.get(uri);
+    if (response.statusCode == 200) {
+      var jsonResponse = jsonDecode(response.body);
+      if (jsonResponse is List && jsonResponse.isNotEmpty) {
+        return jsonResponse[0]['id'] as String;
+      } else {
+        throw Exception("Campo com o nome '$name' não encontrada");
+      }
+    } else {
+      throw Exception("Falha ao carregar o dado");
+    }
+  }
 }

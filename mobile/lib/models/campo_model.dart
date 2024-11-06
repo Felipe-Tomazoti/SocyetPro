@@ -12,7 +12,7 @@ class CampoModel {
   static int _counter = 1;
 
   CampoModel({String? id, required this.campo, String? nome, this.arenaId})
-      : id = Uuid().v4(),
+      : id = id ?? Uuid().v4(),
         nome = nome ?? 'Campo ${_counter++}';
 
   CampoModel.vazio()
@@ -69,10 +69,10 @@ class CampoModel {
   bool verificarDisponibilidade(AluguelModel novoAluguel) {
     for (var aluguel in alugueis) {
       if (aluguel.temSobreposicao(novoAluguel)) {
-        return false; 
+        return false;
       }
     }
-    return true; 
+    return true;
   }
 
   static Categoria _fromStringToCategoria(String? value) {
