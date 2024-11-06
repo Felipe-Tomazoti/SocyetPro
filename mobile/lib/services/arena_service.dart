@@ -4,6 +4,8 @@ import 'package:socyet_pro/services/abstract_methods/abstract_service.dart';
 import 'package:http/http.dart' as http;
 
 class ArenaService extends AbstractService<ArenaModel> {
+  ArenaService({http.Client? client}) : super(client: client);
+
   @override
   String recurso() {
     return "arena";

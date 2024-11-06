@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
@@ -9,23 +10,23 @@ import 'package:socyet_pro/models/login_model.dart';
 import 'package:socyet_pro/screens/login_screen.dart';
 import 'package:socyet_pro/services/arena_service.dart';
 import 'package:socyet_pro/services/login_service.dart';
+import 'package:http/http.dart' as http;
 
 class MockArenaService extends Mock implements ArenaService {}
-
+class HttpClientMock extends Mock implements http.Client {}
 class MockLoginService extends Mock implements LoginService {}
 
 void main() {
   final mockLoginService = MockLoginService();
-
+  late HttpClientMock httpClientMock;
+  late ArenaService arenaService;
+  late String url;
+  
   setUpAll(() {
-    registerFallbackValue(LoginModel.vazio());
-    when(() => mockLoginService.post(any()))
-        .thenAnswer((_) async => {'status': 200});
-  });
-
-  setUpAll(() {
-    registerFallbackValue(LoginModel.vazio());
-    when(() => mockLoginService.post(any())).thenAnswer((_) async => {});
+    url = 'http://localhost:3000/arena';
+    httpClientMock = HttpClientMock();
+    arenaService = ArenaService(client: httpClientMock);
+    registerFallbackValue(Uri.parse(url));
   });
 
   test("criação de arena - Unitário", () {
@@ -47,6 +48,39 @@ void main() {
 
     expect(login.email, "felipecesar005@gmail.com");
     expect(login.pwd, "fefe123");
+  });
+
+   test('deve validar o método GET e retornar uma lista de arenas - Mocktail com HTTP', () async {
+    when(() => httpClientMock.get(Uri.parse(url))).thenAnswer(
+      (_) async => http.Response(
+        jsonEncode([
+          {
+            'id': '1',
+            'nome': 'Arena Socyet',
+            'cnpj': '12345678000199',
+            'telefone': '(44) 99999-9999',
+            'campos': []
+          },
+          {
+            'id': '2',
+            'nome': 'Arena Pro',
+            'cnpj': '98765432000111',
+            'telefone': '(44) 88888-8888',
+            'campos': []
+          },
+        ]),
+        200,
+      ),
+    );
+
+    var result = await arenaService.getAll();
+
+    expect(result, isA<List<ArenaModel>>());
+    expect(result.length, 2);
+    expect(result[0].nome, 'Arena Socyet');
+    expect(result[1].cnpj, '98765432000111');
+
+    verify(() => httpClientMock.get(Uri.parse(url))).called(1);
   });
 
   test("criação de arena - Mocktail", () async {

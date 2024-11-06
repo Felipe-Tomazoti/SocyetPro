@@ -3,13 +3,15 @@ import 'package:http/http.dart' as http;
 
 abstract class AbstractService<T> {
   final String url = "http://localhost:3000";
+  final http.Client client;
+
+  AbstractService({http.Client? client}) : client = client ?? http.Client();
 
   T fromJson(Map<String, dynamic> json);
-
   Map<String, dynamic> toJson(T object);
 
   Future<List<T>> getAll() async {
-    var response = await http.get(Uri.parse("$url/${recurso()}"));
+    var response = await client.get(Uri.parse("$url/${recurso()}"));
     if (response.statusCode == 200) {
       var jsonList = jsonDecode(response.body) as List;
       return jsonList.map((json) => fromJson(json)).toList();
@@ -19,7 +21,7 @@ abstract class AbstractService<T> {
   }
 
   Future<T> getById(String id) async {
-    var response = await http.get(Uri.parse("$url/${recurso()}/$id"));
+    var response = await client.get(Uri.parse("$url/${recurso()}/$id"));
     if (response.statusCode == 200) {
       var jsonResponse = jsonDecode(response.body);
       return fromJson(jsonResponse);
