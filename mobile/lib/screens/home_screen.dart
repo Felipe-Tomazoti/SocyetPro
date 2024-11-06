@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:socyet_pro/models/arena_model.dart';
 import 'package:socyet_pro/enums/campo_enum.dart';
 import 'package:socyet_pro/models/campo_model.dart';
+import 'package:socyet_pro/screens/aluguel_screen.dart';
 import 'package:socyet_pro/services/arena_service.dart';
 import 'package:socyet_pro/services/campo_service.dart';
 import 'package:socyet_pro/widgets/home_drawer.dart';
@@ -146,6 +147,13 @@ class _HomeState extends State<Home> {
                           title: Text(
                             '${campo.nome ?? 'Campo sem nome'} - ${campo.campo?.toString().split('.').last}',
                           ),
+                          onTap: () {
+                            Navigator.of(context).push(
+                              MaterialPageRoute(
+                                builder: (context) => AddAluguelScreen(campo: campo),
+                              ),
+                            );
+                          },
                         );
                       },
                     );

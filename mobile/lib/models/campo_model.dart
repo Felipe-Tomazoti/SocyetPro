@@ -1,3 +1,4 @@
+import 'package:socyet_pro/models/aluguel_model.dart';
 import 'package:uuid/uuid.dart';
 import '../enums/campo_enum.dart';
 
@@ -6,6 +7,7 @@ class CampoModel {
   final Categoria? campo;
   final String? nome;
   String? arenaId;
+  List<AluguelModel> alugueis = [];
 
   static int _counter = 1;
 
@@ -27,6 +29,12 @@ class CampoModel {
       arenaId: json['arenaId'],
     );
 
+    if (json['alugueis'] != null) {
+      campoModel.alugueis = (json['alugueis'] as List)
+          .map((aluguelJson) => AluguelModel.fromJson(aluguelJson))
+          .toList();
+    }
+
     int nomeNumero = int.tryParse(json['nome']?.split(' ').last ?? '0') ?? 0;
     if (nomeNumero >= _counter) {
       _counter = nomeNumero + 1;
@@ -41,18 +49,30 @@ class CampoModel {
       'nome': nome,
       'campo': campo?.toString().split('.').last,
       'arenaId': arenaId,
+      'alugueis': alugueis.map((aluguel) => aluguel.toJson()).toList(),
     };
   }
 
   @override
   String toString() {
-    return 'CampoModel{id: $id, campo: $campo, nome: $nome}';
+    return 'CampoModel{id: $id, campo: $campo, nome: $nome, alugueis: $alugueis}';
   }
 
-  void validationCampo() {
-    if (campo == null) {
-      throw ArgumentError('O campo não pode ser vazio');
+  bool adicionarAluguel(AluguelModel aluguel) {
+    if (verificarDisponibilidade(aluguel)) {
+      alugueis.add(aluguel);
+      return true;
     }
+    return false;
+  }
+
+  bool verificarDisponibilidade(AluguelModel novoAluguel) {
+    for (var aluguel in alugueis) {
+      if (aluguel.temSobreposicao(novoAluguel)) {
+        return false; 
+      }
+    }
+    return true; 
   }
 
   static Categoria _fromStringToCategoria(String? value) {

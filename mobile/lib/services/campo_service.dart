@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:socyet_pro/models/aluguel_model.dart';
 import 'package:socyet_pro/models/campo_model.dart';
 import 'package:socyet_pro/services/abstract_methods/abstract_service.dart';
 import 'arena_service.dart';
@@ -81,4 +82,13 @@ class CampoService extends AbstractService<CampoModel> {
       throw Exception("Falha ao carregar os campos da arena");
     }
   }
+
+  Future<bool> adicionarAluguel(CampoModel campo, AluguelModel aluguel) async {
+  if (campo.verificarDisponibilidade(aluguel)) {
+    campo.alugueis.add(aluguel);
+    await update(campo.id, campo);
+    return true;
+  }
+  return false;
+}
 }

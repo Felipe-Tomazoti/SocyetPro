@@ -31,6 +31,7 @@ abstract class AbstractService<T> {
   }
 
   Future<Map<String, dynamic>> post(T object) async {
+    print("Chegou aqui");
     var response = await http.post(
       Uri.parse("$url/${recurso()}"),
       headers: {"Content-Type": "application/json"},
