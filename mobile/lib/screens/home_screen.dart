@@ -50,6 +50,104 @@ class _HomeState extends State<Home> {
     }
   }
 
+  Future<void> _editCampoCategory(CampoModel campo) async {
+    final selectedCategoria = await showDialog<Categoria>(
+      context: context,
+      builder: (BuildContext context) {
+        Categoria? newCategory = campo.campo;
+        return AlertDialog(
+          title: const Text('Editar Categoria do Campo'),
+          content: DropdownButtonFormField<Categoria>(
+            value: newCategory,
+            decoration: const InputDecoration(
+              contentPadding:
+                  EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+              border: OutlineInputBorder(),
+            ),
+            items: Categoria.values.map((categoria) {
+              return DropdownMenuItem<Categoria>(
+                value: categoria,
+                child: Text(categoria.toString().split('.').last),
+              );
+            }).toList(),
+            onChanged: (value) {
+              setState(() {
+                newCategory = value!;
+              });
+            },
+          ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop(null);
+              },
+              child: const Text('Cancelar'),
+            ),
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop(newCategory);
+              },
+              child: const Text('Salvar'),
+            ),
+          ],
+        );
+      },
+    );
+
+    if (selectedCategoria != null && selectedCategoria != campo.campo) {
+      campo.campo = selectedCategoria;
+      await _campoService.update(campo.id, campo);
+
+      final arena = await _arenaService.getById(campo.arenaId!);
+      int campoIndex = arena.campos.indexWhere((c) => c.id == campo.id);
+      if (campoIndex != -1) {
+        arena.campos[campoIndex] = campo;
+        await _arenaService.update(arena.id, arena);
+        setState(() {
+          _arenaFuture = _fetchArenaData();
+        });
+      }
+    }
+  }
+
+  Future<void> _deleteCampo(CampoModel campo) async {
+    final confirmDelete = await showDialog<bool>(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Excluir Campo'),
+          content: const Text('Tem certeza de que deseja excluir este campo?'),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop(false);
+              },
+              child: const Text('Cancelar'),
+            ),
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop(true);
+              },
+              child: const Text('Excluir'),
+            ),
+          ],
+        );
+      },
+    );
+
+    if (confirmDelete == true) {
+      await _campoService.delete(campo.id);
+
+      final arena = await _arenaService.getById(campo.arenaId!);
+      arena.campos.removeWhere((c) => c.id == campo.id);
+      await _arenaService.update(arena.id, arena);
+
+      setState(() {
+        _arenaFuture = _fetchArenaData();
+      });
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -146,6 +244,21 @@ class _HomeState extends State<Home> {
                         return ListTile(
                           title: Text(
                             '${campo.nome ?? 'Campo sem nome'} - ${campo.campo?.toString().split('.').last}',
+                          ),
+                          trailing: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              IconButton(
+                                icon: Icon(Icons.edit),
+                                onPressed: () => _editCampoCategory(campo),
+                                tooltip: 'Editar Categoria do Campo',
+                              ),
+                              IconButton(
+                                icon: Icon(Icons.delete),
+                                onPressed: () => _deleteCampo(campo),
+                                tooltip: 'Excluir Campo',
+                              ),
+                            ],
                           ),
                           onTap: () {
                             Navigator.of(context).push(

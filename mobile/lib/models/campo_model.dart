@@ -4,7 +4,7 @@ import '../enums/campo_enum.dart';
 
 class CampoModel {
   final String id;
-  final Categoria? campo;
+  Categoria? campo;
   final String? nome;
   String? arenaId;
   List<AluguelModel> alugueis = [];
