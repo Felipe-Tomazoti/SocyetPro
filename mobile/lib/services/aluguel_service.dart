@@ -19,4 +19,9 @@ class AluguelService extends AbstractService<AluguelModel> {
   Map<String, dynamic> toJson(AluguelModel object) {
     return object.toJson();
   }
+
+  @override
+  Future<Map<String, dynamic>> post(AluguelModel object) {
+    return super.post(object);
+  }
 }

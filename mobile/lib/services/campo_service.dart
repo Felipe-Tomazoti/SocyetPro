@@ -47,14 +47,13 @@ class CampoService extends AbstractService<CampoModel> {
     }
   }
 
-  Future<List<CampoModel>> getAllById(String nomeArena) async {
-    final id = await arenaService.getByName(nomeArena);
-    var response = await http.get(Uri.parse("$url/arena/${id}"));
+  Future<List<CampoModel>> getAllById(String arenaId) async {
+    final response = await http.get(Uri.parse("$url/arena/$arenaId"));
     if (response.statusCode == 200) {
       var jsonResponse = jsonDecode(response.body);
       if (jsonResponse.containsKey('campos') &&
           jsonResponse['campos'] is List) {
-        return jsonResponse['campos']
+        return (jsonResponse['campos'] as List)
             .map((json) => CampoModel.fromJson(json))
             .toList();
       } else {
@@ -81,23 +80,20 @@ class CampoService extends AbstractService<CampoModel> {
   }
 
   Future<bool> adicionarAluguel(CampoModel campo, AluguelModel aluguel) async {
-    if (campo.verificarDisponibilidade(aluguel)) {
-      campo.alugueis.add(aluguel);
-      var idCampoAtualizado = await update(campo.id, campo);
+    campo.alugueis.add(aluguel);
+    var idCampoAtualizado = await update(campo.id, campo);
 
-      var arena = await arenaService.getById(campo.arenaId!);
+    var arena = await arenaService.getById(campo.arenaId!);
 
-      int index = arena.campos.indexWhere((c) => c.id == campo.id);
-      if (index != -1) {
-        arena.campos[index] = campo;
+    int index = arena.campos.indexWhere((c) => c.id == campo.id);
+    if (index != -1) {
+      arena.campos[index] = campo;
 
-        await arenaService.update(arena.id, arena);
-        return true;
-      } else {
-        throw Exception("Campo com ID ${campo.id} não encontrado na Arena");
-      }
+      await arenaService.update(arena.id, arena);
+      return true;
+    } else {
+      throw Exception("Campo com ID ${campo.id} não encontrado na Arena");
     }
-    return false;
   }
 
   Future<String> getByName(String name) async {

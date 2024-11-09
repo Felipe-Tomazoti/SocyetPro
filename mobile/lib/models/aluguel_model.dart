@@ -1,7 +1,7 @@
 import 'package:intl/intl.dart';
 
 class AluguelModel {
-final String responsavel;
+  final String responsavel;
   final DateTime inicio;
   final DateTime fim;
 
@@ -11,12 +11,8 @@ final String responsavel;
     required this.fim,
   });
 
-  bool temSobreposicao(AluguelModel outro) {
-    return (inicio.isBefore(outro.fim) && fim.isAfter(outro.inicio));
-  }
-
   factory AluguelModel.fromJson(Map<String, dynamic> json) {
-    var formatter = DateFormat('yyyy-MM-dd HH:mm'); 
+    var formatter = DateFormat('yyyy-MM-dd HH:mm');
     return AluguelModel(
       responsavel: json['responsavel'],
       inicio: formatter.parse(json['inicio']),

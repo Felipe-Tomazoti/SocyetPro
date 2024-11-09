@@ -59,19 +59,7 @@ class CampoModel {
   }
 
   bool adicionarAluguel(AluguelModel aluguel) {
-    if (verificarDisponibilidade(aluguel)) {
-      alugueis.add(aluguel);
-      return true;
-    }
-    return false;
-  }
-
-  bool verificarDisponibilidade(AluguelModel novoAluguel) {
-    for (var aluguel in alugueis) {
-      if (aluguel.temSobreposicao(novoAluguel)) {
-        return false;
-      }
-    }
+    alugueis.add(aluguel);
     return true;
   }
 

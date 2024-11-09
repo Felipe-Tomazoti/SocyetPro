@@ -45,21 +45,28 @@ class _AluguelState extends State<Aluguel> {
   }
 
   Future<void> _selecionarHorarioInicio() async {
-    final time =
-        await showTimePicker(context: context, initialTime: TimeOfDay.now());
+    final time = await showTimePicker(
+      context: context,
+      initialTime: TimeOfDay.now(),
+    );
     if (time != null) {
       setState(() {
-        _inicio = DateTime(0, 0, 0, time.hour, time.minute);
+        final now = DateTime.now();
+        _inicio =
+            DateTime(now.year, now.month, now.day, time.hour, time.minute);
       });
     }
   }
 
   Future<void> _selecionarHorarioFim() async {
-    final time =
-        await showTimePicker(context: context, initialTime: TimeOfDay.now());
+    final time = await showTimePicker(
+      context: context,
+      initialTime: TimeOfDay.now(),
+    );
     if (time != null) {
       setState(() {
-        _fim = DateTime(0, 0, 0, time.hour, time.minute);
+        final now = DateTime.now();
+        _fim = DateTime(now.year, now.month, now.day, time.hour, time.minute);
       });
     }
   }

@@ -3,6 +3,7 @@ import 'package:socyet_pro/models/arena_model.dart';
 import 'package:socyet_pro/enums/campo_enum.dart';
 import 'package:socyet_pro/models/campo_model.dart';
 import 'package:socyet_pro/screens/aluguel_screen.dart';
+import 'package:socyet_pro/screens/listar_alugueis_screen.dart';
 import 'package:socyet_pro/services/arena_service.dart';
 import 'package:socyet_pro/services/campo_service.dart';
 import 'package:socyet_pro/widgets/home_drawer.dart';
@@ -177,6 +178,20 @@ class _HomeState extends State<Home> {
         ),
         centerTitle: true,
         toolbarHeight: 170,
+        actions: [
+          IconButton(
+            icon: Icon(Icons.list),
+            tooltip: 'Ver Aluguéis',
+            onPressed: () {
+              Navigator.of(context).push(
+                MaterialPageRoute(
+                  builder: (context) =>
+                      ListaAlugueisScreen(arenaId: arenaSelecionada.id),
+                ),
+              );
+            },
+          ),
+        ],
       ),
       drawer: HomeDrawer(),
       body: Padding(
